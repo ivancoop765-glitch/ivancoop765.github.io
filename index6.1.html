@@ -1,0 +1,1371 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Inventario - D Nelson Zona Anhela</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+            color: #ffffff;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        /* Estilos para pantalla de login/registro */
+        .auth-screen {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            z-index: 1000;
+            background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+        }
+
+        .auth-screen.hidden {
+            display: none;
+        }
+
+        .auth-container {
+            background: #2d2d2d;
+            padding: 40px;
+            border-radius: 12px;
+            border: 3px solid #FFD700;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.7);
+            width: 100%;
+            max-width: 400px;
+        }
+
+        .auth-logo {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .auth-logo img {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            border: 2px solid #FFD700;
+            margin-bottom: 15px;
+        }
+
+        .auth-logo h1 {
+            color: #FFD700;
+            font-size: 1.8em;
+            margin-bottom: 5px;
+        }
+
+        .auth-logo p {
+            color: #999999;
+            font-size: 0.9em;
+        }
+
+        .auth-form {
+            display: none;
+        }
+
+        .auth-form.active {
+            display: block;
+        }
+
+        .auth-input {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 15px;
+            border: 2px solid #722F37;
+            background: #1a1a1a;
+            color: #ffffff;
+            border-radius: 6px;
+            font-size: 1em;
+            transition: all 0.3s;
+        }
+
+        .auth-input:focus {
+            outline: none;
+            border-color: #FFD700;
+            box-shadow: 0 0 15px rgba(255, 215, 0, 0.4);
+        }
+
+        .auth-btn {
+            width: 100%;
+            padding: 12px;
+            background: #FFD700;
+            color: #722F37;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 1em;
+            transition: all 0.3s;
+            margin-bottom: 15px;
+        }
+
+        .auth-btn:hover {
+            background: #FFC700;
+            box-shadow: 0 5px 15px rgba(255, 215, 0, 0.4);
+            transform: translateY(-2px);
+        }
+
+        .auth-toggle {
+            text-align: center;
+            color: #999999;
+            font-size: 0.9em;
+        }
+
+        .auth-toggle a {
+            color: #FFD700;
+            cursor: pointer;
+            text-decoration: none;
+            font-weight: bold;
+            margin-left: 5px;
+        }
+
+        .auth-toggle a:hover {
+            text-decoration: underline;
+        }
+
+        .auth-error {
+            background: #722F37;
+            color: #FFD700;
+            padding: 12px;
+            border-radius: 6px;
+            margin-bottom: 15px;
+            border: 1px solid #FFD700;
+            display: none;
+        }
+
+        .auth-error.show {
+            display: block;
+        }
+
+        .logout-btn {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 10px 20px;
+            background: #722F37;
+            color: #FFD700;
+            border: 2px solid #FFD700;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            z-index: 999;
+            transition: all 0.3s;
+        }
+
+        .logout-btn:hover {
+            background: #FFD700;
+            color: #722F37;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+            background: #722F37;
+            padding: 20px;
+            border-radius: 12px;
+            border: 3px solid #FFD700;
+        }
+
+        .logo-container {
+            flex-shrink: 0;
+        }
+
+        .logo {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            object-fit: contain;
+            background: white;
+            padding: 5px;
+            border: 3px solid #FFD700;
+        }
+
+        header-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        h1 {
+            color: #FFD700;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 0 0 10px rgba(255, 215, 0, 0.3);
+        }
+
+        header p {
+            color: #f0f0f0;
+            font-size: 1.1em;
+        }
+
+        .nav-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .nav-btn {
+            padding: 12px 24px;
+            background: #722F37;
+            color: #FFD700;
+            border: 2px solid #FFD700;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .nav-btn:hover {
+            background: #FFD700;
+            color: #722F37;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 215, 0, 0.4);
+        }
+
+        .nav-btn.active {
+            background: #FFD700;
+            color: #722F37;
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.6);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .form-section {
+            background: #2d2d2d;
+            padding: 25px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+            border: 2px solid #FFD700;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #FFD700;
+            font-weight: 600;
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #722F37;
+            background: #1a1a1a;
+            color: #ffffff;
+            border-radius: 6px;
+            font-size: 1em;
+            transition: all 0.3s;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: #FFD700;
+            box-shadow: 0 0 15px rgba(255, 215, 0, 0.4);
+            background: #0a0a0a;
+        }
+
+        button {
+            padding: 12px 30px;
+            background: #FFD700;
+            color: #722F37;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 1em;
+            transition: all 0.3s;
+        }
+
+        button:hover {
+            background: #FFC700;
+            box-shadow: 0 5px 15px rgba(255, 215, 0, 0.4);
+            transform: translateY(-2px);
+        }
+
+        .table-container {
+            background: #2d2d2d;
+            padding: 25px;
+            border-radius: 12px;
+            border: 2px solid #FFD700;
+            overflow-x: auto;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th {
+            background: #722F37;
+            color: #FFD700;
+            padding: 15px;
+            text-align: left;
+            border-bottom: 2px solid #FFD700;
+            font-weight: 700;
+        }
+
+        td {
+            padding: 15px;
+            border-bottom: 1px solid rgba(255, 215, 0, 0.2);
+            color: #ffffff;
+        }
+
+        tr:hover {
+            background: rgba(255, 215, 0, 0.1);
+        }
+
+        .delete-btn {
+            background: #722F37;
+            color: #FFD700;
+            padding: 6px 12px;
+            border: 1px solid #FFD700;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.9em;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .delete-btn:hover {
+            background: #FFD700;
+            color: #722F37;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: #999999;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: #2d2d2d;
+            padding: 20px;
+            border-radius: 12px;
+            border: 2px solid #722F37;
+            text-align: center;
+        }
+
+        .stat-card:hover {
+            border-color: #FFD700;
+            box-shadow: 0 5px 15px rgba(255, 215, 0, 0.2);
+        }
+
+        .stat-value {
+            font-size: 2em;
+            color: #FFD700;
+            font-weight: bold;
+        }
+
+        .stat-label {
+            color: #999999;
+            margin-top: 10px;
+        }
+
+        .success-message {
+            background: #FFD700;
+            color: #722F37;
+            padding: 15px;
+            border-radius: 6px;
+            margin-bottom: 15px;
+            display: none;
+            font-weight: 600;
+        }
+
+        .success-message.show {
+            display: block;
+        }
+
+        h2 {
+            color: #FFD700;
+            margin-bottom: 20px;
+            font-size: 1.8em;
+            text-shadow: 0 0 5px rgba(255, 215, 0, 0.2);
+        }
+
+        .amount-paid {
+            color: #FFD700;
+            font-weight: bold;
+        }
+
+        .status-paid {
+            background: #722F37;
+            color: #FFD700;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            font-weight: bold;
+            border: 1px solid #FFD700;
+        }
+
+        .status-pending {
+            background: #808080;
+            color: #FFD700;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            font-weight: bold;
+            border: 1px solid #FFD700;
+        }
+
+        /* Nuevos estilos para mostrar imágenes de productos */
+        .producto-img {
+            width: 80px;
+            height: 120px;
+            object-fit: contain;
+            background: #1a1a1a;
+            padding: 5px;
+            border-radius: 4px;
+            border: 1px solid #FFD700;
+        }
+
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .product-card {
+            background: #2d2d2d;
+            padding: 15px;
+            border-radius: 12px;
+            border: 2px solid #722F37;
+            text-align: center;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+
+        .product-card:hover {
+            border-color: #FFD700;
+            box-shadow: 0 5px 15px rgba(255, 215, 0, 0.2);
+            transform: translateY(-5px);
+        }
+
+        .product-card img {
+            width: 100px;
+            height: 150px;
+            object-fit: contain;
+            margin-bottom: 10px;
+        }
+
+        .product-card-name {
+            color: #FFD700;
+            font-weight: bold;
+            font-size: 0.95em;
+            margin-bottom: 5px;
+        }
+
+        .product-card-type {
+            color: #999999;
+            font-size: 0.85em;
+            margin-bottom: 10px;
+        }
+
+        .product-card-quantity {
+            color: #ffffff;
+            font-size: 0.9em;
+        }
+
+        @media (max-width: 768px) {
+            header {
+                flex-direction: column;
+            }
+
+            h1 {
+                font-size: 1.8em;
+            }
+
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .nav-tabs {
+                flex-direction: column;
+            }
+
+            .nav-btn {
+                width: 100%;
+            }
+
+            table {
+                font-size: 0.9em;
+            }
+
+            td, th {
+                padding: 10px;
+            }
+
+            .logo {
+                width: 100px;
+                height: 100px;
+            }
+
+            .products-grid {
+                grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            }
+
+            .auth-container {
+                margin: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Pantalla de autenticación -->
+    <div id="authScreen" class="auth-screen">
+        <div class="auth-container">
+            <div class="auth-logo">
+                <img src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/imagen_2025-11-11_182956837-qXEMmu3gjABbO2fEvcjozrtsJBiKM7.png" alt="Logo D Nelson">
+                <h1>D NELSON</h1>
+                <p>Zona Anhela - Inventario</p>
+            </div>
+
+            <!-- Formulario de Login -->
+            <form class="auth-form active" id="loginForm" onsubmit="handleLogin(event)">
+                <div class="auth-error" id="loginError"></div>
+                <input type="text" class="auth-input" placeholder="Usuario" id="loginUsuario" required>
+                <input type="password" class="auth-input" placeholder="Contraseña" id="loginPassword" required>
+                <button type="submit" class="auth-btn">🔓 Ingresar</button>
+                <div class="auth-toggle">
+                    ¿No tienes cuenta?
+                    <a onclick="toggleForms()">Registrate aquí</a>
+                </div>
+            </form>
+
+            <!-- Formulario de Registro -->
+            <form class="auth-form" id="registerForm" onsubmit="handleRegister(event)">
+                <div class="auth-error" id="registerError"></div>
+                <input type="text" class="auth-input" placeholder="Usuario" id="registerUsuario" required>
+                <input type="password" class="auth-input" placeholder="Contraseña" id="registerPassword" required>
+                <input type="password" class="auth-input" placeholder="Confirmar Contraseña" id="registerPasswordConfirm" required>
+                <input type="email" class="auth-input" placeholder="Correo electrónico" id="registerEmail" required>
+                <button type="submit" class="auth-btn">✅ Crear Cuenta</button>
+                <div class="auth-toggle">
+                    ¿Ya tienes cuenta?
+                    <a onclick="toggleForms()">Inicia sesión aquí</a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Botón de cerrar sesión -->
+    <button class="logout-btn" id="logoutBtn" style="display: none;" onclick="handleLogout()">🚪 Cerrar Sesión</button>
+
+    <div class="container" id="appContainer" style="display: none;">
+        <header>
+            <div class="logo-container">
+                <img src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/imagen_2025-11-11_182956837-qXEMmu3gjABbO2fEvcjozrtsJBiKM7.png" alt="Logo D Nelson" class="logo">
+            </div>
+            <div>
+                <h1>D NELSON - ZONA ANHELA</h1>
+                <p>Sistema de Inventario de Bar</p>
+                <p id="usuarioInfo" style="color: #FFD700; font-size: 0.9em; margin-top: 10px;"></p>
+            </div>
+        </header>
+
+        <div class="nav-tabs">
+            <button class="nav-btn active" onclick="showTab('inventario')">📦 Inventario</button>
+            <button class="nav-btn" onclick="showTab('retiros')">🚚 Registro de Retiros</button>
+            <button class="nav-btn" onclick="showTab('pagos')">💰 Registro de Pagos</button>
+        </div>
+
+        <!-- TAB: INVENTARIO -->
+        <div id="inventario" class="tab-content active">
+            <div class="form-section">
+                <h2>Agregar Producto al Inventario</h2>
+                <div id="successInventario" class="success-message"></div>
+                <div class="form-grid">
+                    <div>
+                        <label for="productoNombre">Nombre del Producto</label>
+                        <input type="text" id="productoNombre" placeholder="ej: Ron Bacardi" list="productosDisponibles">
+                        <datalist id="productosDisponibles">
+                            <option value="Néctar">
+                            <option value="Cristal">
+                            <option value="Bacardí">
+                            <option value="Ron Caldas">
+                            <option value="Ron Santander">
+                            <option value="Poker">
+                            <option value="Águila">
+                            <option value="Costeña">
+                            <option value="Club Colombia">
+                            <option value="Tecate">
+                        </datalist>
+                    </div>
+                    <div>
+                        <label for="productoTipo">Tipo de Bebida</label>
+                        <select id="productoTipo" onchange="actualizarImagenProducto()">
+                            <option value="">Seleccionar tipo</option>
+                            <option value="Aguardiente">Aguardiente</option>
+                            <option value="Vodka">Vodka</option>
+                            <option value="Ron">Ron</option>
+                            <option value="Cerveza">Cerveza</option>
+                            <option value="Whiskey">Whiskey</option>
+                            <option value="Ginebra">Ginebra</option>
+                            <option value="Licor">Licor</option>
+                            <option value="Otro">Otro</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="productoCantidad">Cantidad de Botellas</label>
+                        <input type="number" id="productoCantidad" placeholder="ej: 12" min="1">
+                    </div>
+                    <div>
+                        <label for="productoPrecio">Precio Unitario ($)</label>
+                        <input type="number" id="productoPrecio" placeholder="ej: 25.50" step="0.01" min="0">
+                    </div>
+                    <div>
+                        <label for="productoFecha">Fecha de Ingreso</label>
+                        <input type="date" id="productoFecha">
+                    </div>
+                </div>
+                <div style="text-align: center; margin-bottom: 15px;">
+                    <img id="productoPreviewImg" style="width: 80px; height: 120px; object-fit: contain; border: 2px solid #FFD700; border-radius: 6px; padding: 5px; background: #1a1a1a;" alt="Vista previa">
+                </div>
+                <button onclick="agregarProducto()">✅ Agregar Producto</button>
+            </div>
+
+            <div style="margin-bottom: 30px;">
+                <h2>📸 Productos Disponibles</h2>
+                <div class="products-grid" id="productosGaleria"></div>
+            </div>
+
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-value" id="totalProductos">0</div>
+                    <div class="stat-label">Productos en Inventario</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="totalBotellas">0</div>
+                    <div class="stat-label">Total de Botellas</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="valorInventario">$0.00</div>
+                    <div class="stat-label">Valor Total Inventario</div>
+                </div>
+            </div>
+
+            <div class="table-container">
+                <h2>📋 Inventario Actual</h2>
+                <table id="tablaInventario">
+                    <thead>
+                        <tr>
+                            <th>Imagen</th>
+                            <th>Producto</th>
+                            <th>Tipo</th>
+                            <th>Cantidad</th>
+                            <th>Precio Unitario</th>
+                            <th>Valor Total</th>
+                            <th>Fecha Ingreso</th>
+                            <th>Acción</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- TAB: RETIROS -->
+        <div id="retiros" class="tab-content">
+            <div class="form-section">
+                <h2>Registrar Retiro de Producto</h2>
+                <div id="successRetiro" class="success-message"></div>
+                <div class="form-grid">
+                    <div>
+                        <label for="retiroPersona">Nombre de Quién Retira</label>
+                        <input type="text" id="retiroPersona" placeholder="ej: Juan">
+                    </div>
+                    <div>
+                        <label for="retiroProducto">Producto a Retirar</label>
+                        <select id="retiroProducto">
+                            <option value="">Seleccionar producto</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="retiroCantidad">Cantidad de Botellas</label>
+                        <input type="number" id="retiroCantidad" placeholder="ej: 2" min="1">
+                    </div>
+                    <div>
+                        <label for="retiroHora">Hora del Retiro</label>
+                        <input type="time" id="retiroHora">
+                    </div>
+                    <div>
+                        <label for="retiroFecha">Fecha del Retiro</label>
+                        <input type="date" id="retiroFecha">
+                    </div>
+                    <div>
+                        <label for="retiroNota">Nota (opcional)</label>
+                        <textarea id="retiroNota" placeholder="Observaciones del retiro" rows="1"></textarea>
+                    </div>
+                </div>
+                <button onclick="registrarRetiro()">✅ Registrar Retiro</button>
+            </div>
+
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-value" id="totalRetiros">0</div>
+                    <div class="stat-label">Total de Retiros</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="botellasTotalRetiradas">0</div>
+                    <div class="stat-label">Botellas Retiradas</div>
+                </div>
+            </div>
+
+            <div class="table-container">
+                <h2>📊 Historial de Retiros</h2>
+                <table id="tablaRetiros">
+                    <thead>
+                        <tr>
+                            <th>Quién Retira</th>
+                            <th>Producto</th>
+                            <th>Botellas</th>
+                            <th>Fecha</th>
+                            <th>Hora</th>
+                            <th>Nota</th>
+                            <th>Acción</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- TAB: PAGOS -->
+        <div id="pagos" class="tab-content">
+            <div class="form-section">
+                <h2>Registrar Pago</h2>
+                <div id="successPago" class="success-message"></div>
+                <div class="form-grid">
+                    <div>
+                        <label for="pagoPersona">Nombre de Quién Paga</label>
+                        <input type="text" id="pagoPersona" placeholder="ej: Juan">
+                    </div>
+                    <div>
+                        <label for="pagoMonto">Monto Pagado ($)</label>
+                        <input type="number" id="pagoMonto" placeholder="ej: 50.00" step="0.01" min="0">
+                    </div>
+                    <div>
+                        <label for="pagoConcepto">Concepto del Pago</label>
+                        <input type="text" id="pagoConcepto" placeholder="ej: Retiro de botellas">
+                    </div>
+                    <div>
+                        <label for="pagoMetodo">Método de Pago</label>
+                        <select id="pagoMetodo">
+                            <option value="">Seleccionar método</option>
+                            <option value="Efectivo">Efectivo</option>
+                            <option value="Transferencia">Transferencia</option>
+                            <option value="Cheque">Cheque</option>
+                            <option value="Tarjeta">Tarjeta</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="pagoFecha">Fecha del Pago</label>
+                        <input type="date" id="pagoFecha">
+                    </div>
+                    <div>
+                        <label for="pagoNota">Nota (opcional)</label>
+                        <textarea id="pagoNota" placeholder="Detalles del pago" rows="1"></textarea>
+                    </div>
+                </div>
+                <button onclick="registrarPago()">✅ Registrar Pago</button>
+            </div>
+
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-value" id="totalPagos">0</div>
+                    <div class="stat-label">Total de Pagos</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value amount-paid" id="montoTotalPagado">$0.00</div>
+                    <div class="stat-label">Monto Total Pagado</div>
+                </div>
+            </div>
+
+            <div class="table-container">
+                <h2>💳 Historial de Pagos</h2>
+                <table id="tablaPagos">
+                    <thead>
+                        <tr>
+                            <th>Quién Paga</th>
+                            <th>Monto</th>
+                            <th>Concepto</th>
+                            <th>Método</th>
+                            <th>Fecha</th>
+                            <th>Nota</th>
+                            <th>Estado</th>
+                            <th>Acción</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let usuarioActual = null;
+        let usuarios = {};
+
+        function toggleForms() {
+            const loginForm = document.getElementById('loginForm');
+            const registerForm = document.getElementById('registerForm');
+            loginForm.classList.toggle('active');
+            registerForm.classList.toggle('active');
+            document.getElementById('loginError').textContent = '';
+            document.getElementById('registerError').textContent = '';
+        }
+
+        function handleLogin(event) {
+            event.preventDefault();
+            const usuario = document.getElementById('loginUsuario').value.trim();
+            const password = document.getElementById('loginPassword').value;
+            const errorDiv = document.getElementById('loginError');
+
+            if (!usuarios[usuario]) {
+                errorDiv.textContent = '❌ Usuario no encontrado';
+                errorDiv.classList.add('show');
+                return;
+            }
+
+            if (usuarios[usuario].password !== password) {
+                errorDiv.textContent = '❌ Contraseña incorrecta';
+                errorDiv.classList.add('show');
+                return;
+            }
+
+            usuarioActual = usuario;
+            localStorage.setItem('usuarioActual', usuario);
+            mostrarApp();
+        }
+
+        function handleRegister(event) {
+            event.preventDefault();
+            const usuario = document.getElementById('registerUsuario').value.trim();
+            const password = document.getElementById('registerPassword').value;
+            const passwordConfirm = document.getElementById('registerPasswordConfirm').value;
+            const email = document.getElementById('registerEmail').value.trim();
+            const errorDiv = document.getElementById('registerError');
+
+            if (usuario.length < 3) {
+                errorDiv.textContent = '❌ El usuario debe tener al menos 3 caracteres';
+                errorDiv.classList.add('show');
+                return;
+            }
+
+            if (password.length < 4) {
+                errorDiv.textContent = '❌ La contraseña debe tener al menos 4 caracteres';
+                errorDiv.classList.add('show');
+                return;
+            }
+
+            if (password !== passwordConfirm) {
+                errorDiv.textContent = '❌ Las contraseñas no coinciden';
+                errorDiv.classList.add('show');
+                return;
+            }
+
+            if (usuarios[usuario]) {
+                errorDiv.textContent = '❌ El usuario ya existe';
+                errorDiv.classList.add('show');
+                return;
+            }
+
+            usuarios[usuario] = {
+                password,
+                email,
+                fechaRegistro: new Date().toLocaleDateString()
+            };
+
+            localStorage.setItem('usuarios', JSON.stringify(usuarios));
+            errorDiv.classList.remove('show');
+            usuarioActual = usuario;
+            localStorage.setItem('usuarioActual', usuario);
+            mostrarApp();
+        }
+
+        function handleLogout() {
+            if (confirm('¿Estás seguro de que deseas cerrar sesión?')) {
+                usuarioActual = null;
+                localStorage.removeItem('usuarioActual');
+                document.getElementById('authScreen').classList.remove('hidden');
+                document.getElementById('appContainer').style.display = 'none';
+                document.getElementById('logoutBtn').style.display = 'none';
+                document.getElementById('loginForm').classList.add('active');
+                document.getElementById('registerForm').classList.remove('active');
+                document.getElementById('loginUsuario').value = '';
+                document.getElementById('loginPassword').value = '';
+            }
+        }
+
+        function mostrarApp() {
+            document.getElementById('authScreen').classList.add('hidden');
+            document.getElementById('appContainer').style.display = 'block';
+            document.getElementById('logoutBtn').style.display = 'block';
+            document.getElementById('usuarioInfo').textContent = `👤 Bienvenido: ${usuarioActual}`;
+            cargarDatos();
+        }
+
+        function verificarSesion() {
+            const usuarioGuardado = localStorage.getItem('usuarioActual');
+            const usuariosGuardados = localStorage.getItem('usuarios');
+
+            if (usuariosGuardados) {
+                usuarios = JSON.parse(usuariosGuardados);
+            }
+
+            if (usuarioGuardado && usuarios[usuarioGuardado]) {
+                usuarioActual = usuarioGuardado;
+                mostrarApp();
+            }
+        }
+
+        const productosDB = {
+            'Néctar': {
+                tipo: 'Aguardiente',
+                imagen: '/placeholder.svg?height=200&width=100'
+            },
+            'Cristal': {
+                tipo: 'Aguardiente',
+                imagen: '/placeholder.svg?height=200&width=100'
+            },
+            'Bacardí': {
+                tipo: 'Vodka',
+                imagen: '/placeholder.svg?height=200&width=100'
+            },
+            'Ron Caldas': {
+                tipo: 'Ron',
+                imagen: '/placeholder.svg?height=200&width=100'
+            },
+            'Ron Santander': {
+                tipo: 'Ron',
+                imagen: '/placeholder.svg?height=200&width=100'
+            },
+            'Poker': {
+                tipo: 'Cerveza',
+                imagen: '/placeholder.svg?height=200&width=100'
+            },
+            'Águila': {
+                tipo: 'Cerveza',
+                imagen: '/placeholder.svg?height=200&width=100'
+            },
+            'Costeña': {
+                tipo: 'Cerveza',
+                imagen: '/placeholder.svg?height=200&width=100'
+            },
+            'Club Colombia': {
+                tipo: 'Cerveza',
+                imagen: '/placeholder.svg?height=200&width=100'
+            },
+            'Tecate': {
+                tipo: 'Cerveza',
+                imagen: '/placeholder.svg?height=200&width=100'
+            }
+        };
+
+        function guardarDatos() {
+            const datos = {
+                inventario,
+                retiros,
+                pagos
+            };
+            localStorage.setItem(`datos_${usuarioActual}`, JSON.stringify(datos));
+        }
+
+        function cargarDatos() {
+            const datosGuardados = localStorage.getItem(`datos_${usuarioActual}`);
+            if (datosGuardados) {
+                const datos = JSON.parse(datosGuardados);
+                inventario = datos.inventario || [];
+                retiros = datos.retiros || [];
+                pagos = datos.pagos || [];
+            } else {
+                inventario = [];
+                retiros = [];
+                pagos = [];
+            }
+            actualizar();
+        }
+
+        let inventario = [];
+        let retiros = [];
+        let pagos = [];
+
+        function showTab(tabName) {
+            document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
+            document.getElementById(tabName).classList.add('active');
+            event.target.classList.add('active');
+            actualizar();
+        }
+
+        function obtenerImagenProducto(nombre) {
+            const producto = productosDB[nombre];
+            return producto ? producto.imagen : '/placeholder.svg?height=200&width=100';
+        }
+
+        function actualizarImagenProducto() {
+            const nombre = document.getElementById('productoNombre').value.trim();
+            const imagen = obtenerImagenProducto(nombre);
+            document.getElementById('productoPreviewImg').src = imagen;
+        }
+
+        function agregarProducto() {
+            const nombre = document.getElementById('productoNombre').value.trim();
+            const tipo = document.getElementById('productoTipo').value;
+            const cantidad = parseInt(document.getElementById('productoCantidad').value);
+            const precio = parseFloat(document.getElementById('productoPrecio').value);
+            const fecha = document.getElementById('productoFecha').value;
+
+            if (!nombre || !tipo || !cantidad || !precio || !fecha) {
+                alert('Por favor completa todos los campos');
+                return;
+            }
+
+            inventario.push({
+                id: Date.now(),
+                nombre,
+                tipo,
+                cantidad,
+                precio,
+                fecha,
+                imagen: obtenerImagenProducto(nombre)
+            });
+
+            mostrarExito('successInventario', 'Producto agregado correctamente ✓');
+            limpiarFormulario(['productoNombre', 'productoTipo', 'productoCantidad', 'productoPrecio', 'productoFecha']);
+            document.getElementById('productoPreviewImg').src = '/placeholder.svg?height=200&width=100';
+            guardarDatos();
+            actualizar();
+        }
+
+        function eliminarProducto(id) {
+            if (confirm('¿Estás seguro de que quieres eliminar este producto?')) {
+                inventario = inventario.filter(p => p.id !== id);
+                guardarDatos();
+                actualizar();
+            }
+        }
+
+        function registrarRetiro() {
+            const persona = document.getElementById('retiroPersona').value.trim();
+            const productoId = parseInt(document.getElementById('retiroProducto').value);
+            const cantidad = parseInt(document.getElementById('retiroCantidad').value);
+            const hora = document.getElementById('retiroHora').value;
+            const fecha = document.getElementById('retiroFecha').value;
+            const nota = document.getElementById('retiroNota').value.trim();
+
+            if (!persona || !productoId || !cantidad || !hora || !fecha) {
+                alert('Por favor completa los campos obligatorios');
+                return;
+            }
+
+            const producto = inventario.find(p => p.id === productoId);
+            if (!producto) {
+                alert('Producto no encontrado');
+                return;
+            }
+
+            if (producto.cantidad < cantidad) {
+                alert(`No hay suficientes botellas. Disponibles: ${producto.cantidad}`);
+                return;
+            }
+
+            producto.cantidad -= cantidad;
+
+            retiros.push({
+                id: Date.now(),
+                persona,
+                productoNombre: producto.nombre,
+                productoTipo: producto.tipo,
+                cantidad,
+                fecha,
+                hora,
+                nota
+            });
+
+            mostrarExito('successRetiro', 'Retiro registrado correctamente ✓');
+            limpiarFormulario(['retiroPersona', 'retiroProducto', 'retiroCantidad', 'retiroHora', 'retiroFecha', 'retiroNota']);
+            guardarDatos();
+            actualizar();
+        }
+
+        function eliminarRetiro(id) {
+            if (confirm('¿Estás seguro de que quieres eliminar este registro?')) {
+                const retiro = retiros.find(r => r.id === id);
+                const producto = inventario.find(p => p.nombre === retiro.productoNombre);
+                if (producto) {
+                    producto.cantidad += retiro.cantidad;
+                }
+                retiros = retiros.filter(r => r.id !== id);
+                guardarDatos();
+                actualizar();
+            }
+        }
+
+        function registrarPago() {
+            const persona = document.getElementById('pagoPersona').value.trim();
+            const monto = parseFloat(document.getElementById('pagoMonto').value);
+            const concepto = document.getElementById('pagoConcepto').value.trim();
+            const metodo = document.getElementById('pagoMetodo').value;
+            const fecha = document.getElementById('pagoFecha').value;
+            const nota = document.getElementById('pagoNota').value.trim();
+
+            if (!persona || !monto || !concepto || !metodo || !fecha) {
+                alert('Por favor completa los campos obligatorios');
+                return;
+            }
+
+            pagos.push({
+                id: Date.now(),
+                persona,
+                monto,
+                concepto,
+                metodo,
+                fecha,
+                nota,
+                estado: 'Pagado'
+            });
+
+            mostrarExito('successPago', 'Pago registrado correctamente ✓');
+            limpiarFormulario(['pagoPersona', 'pagoMonto', 'pagoConcepto', 'pagoMetodo', 'pagoFecha', 'pagoNota']);
+            guardarDatos();
+            actualizar();
+        }
+
+        function eliminarPago(id) {
+            if (confirm('¿Estás seguro de que quieres eliminar este pago?')) {
+                pagos = pagos.filter(p => p.id !== id);
+                guardarDatos();
+                actualizar();
+            }
+        }
+
+        function actualizar() {
+            actualizarTablaInventario();
+            actualizarTablaRetiros();
+            actualizarTablaPagos();
+            actualizarEstadisticas();
+            actualizarSelectProductos();
+            actualizarGaleria();
+        }
+
+        function actualizarTablaInventario() {
+            const tbody = document.querySelector('#tablaInventario tbody');
+            tbody.innerHTML = '';
+
+            if (inventario.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="8" class="empty-state">No hay productos en inventario</td></tr>';
+                return;
+            }
+
+            inventario.forEach(producto => {
+                const valorTotal = (producto.cantidad * producto.precio).toFixed(2);
+                const row = `
+                    <tr>
+                        <td><img src="${producto.imagen}" alt="${producto.nombre}" class="producto-img"></td>
+                        <td>${producto.nombre}</td>
+                        <td>${producto.tipo}</td>
+                        <td>${producto.cantidad}</td>
+                        <td>$${producto.precio.toFixed(2)}</td>
+                        <td>$${valorTotal}</td>
+                        <td>${producto.fecha}</td>
+                        <td><button class="delete-btn" onclick="eliminarProducto(${producto.id})">Eliminar</button></td>
+                    </tr>
+                `;
+                tbody.innerHTML += row;
+            });
+        }
+
+        function actualizarTablaRetiros() {
+            const tbody = document.querySelector('#tablaRetiros tbody');
+            tbody.innerHTML = '';
+
+            if (retiros.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7" class="empty-state">No hay retiros registrados</td></tr>';
+                return;
+            }
+
+            retiros.forEach(retiro => {
+                const row = `
+                    <tr>
+                        <td>${retiro.persona}</td>
+                        <td>${retiro.productoNombre}</td>
+                        <td>${retiro.cantidad}</td>
+                        <td>${retiro.fecha}</td>
+                        <td>${retiro.hora}</td>
+                        <td>${retiro.nota || '-'}</td>
+                        <td><button class="delete-btn" onclick="eliminarRetiro(${retiro.id})">Eliminar</button></td>
+                    </tr>
+                `;
+                tbody.innerHTML += row;
+            });
+        }
+
+        function actualizarTablaPagos() {
+            const tbody = document.querySelector('#tablaPagos tbody');
+            tbody.innerHTML = '';
+
+            if (pagos.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="8" class="empty-state">No hay pagos registrados</td></tr>';
+                return;
+            }
+
+            pagos.forEach(pago => {
+                const estado = `<span class="status-paid">${pago.estado}</span>`;
+                const row = `
+                    <tr>
+                        <td>${pago.persona}</td>
+                        <td>$${pago.monto.toFixed(2)}</td>
+                        <td>${pago.concepto}</td>
+                        <td>${pago.metodo}</td>
+                        <td>${pago.fecha}</td>
+                        <td>${pago.nota || '-'}</td>
+                        <td>${estado}</td>
+                        <td><button class="delete-btn" onclick="eliminarPago(${pago.id})">Eliminar</button></td>
+                    </tr>
+                `;
+                tbody.innerHTML += row;
+            });
+        }
+
+        function actualizarEstadisticas() {
+            document.getElementById('totalProductos').textContent = inventario.length;
+            const totalBotellas = inventario.reduce((sum, p) => sum + p.cantidad, 0);
+            document.getElementById('totalBotellas').textContent = totalBotellas;
+            const valorTotal = inventario.reduce((sum, p) => sum + (p.cantidad * p.precio), 0);
+            document.getElementById('valorInventario').textContent = `$${valorTotal.toFixed(2)}`;
+
+            document.getElementById('totalRetiros').textContent = retiros.length;
+            const botellasTotalRetiradas = retiros.reduce((sum, r) => sum + r.cantidad, 0);
+            document.getElementById('botellasTotalRetiradas').textContent = botellasTotalRetiradas;
+
+            document.getElementById('totalPagos').textContent = pagos.length;
+            const montoTotal = pagos.reduce((sum, p) => sum + p.monto, 0);
+            document.getElementById('montoTotalPagado').textContent = `$${montoTotal.toFixed(2)}`;
+        }
+
+        function actualizarSelectProductos() {
+            const select = document.getElementById('retiroProducto');
+            const opcionesActuales = select.querySelectorAll('option:not(:first-child)');
+            opcionesActuales.forEach(op => op.remove());
+
+            inventario.forEach(producto => {
+                const option = document.createElement('option');
+                option.value = producto.id;
+                option.textContent = `${producto.nombre} (${producto.tipo}) - ${producto.cantidad} botellas`;
+                select.appendChild(option);
+            });
+        }
+
+        function actualizarGaleria() {
+            const galeria = document.getElementById('productosGaleria');
+            galeria.innerHTML = '';
+
+            Object.keys(productosDB).forEach(nombreProducto => {
+                const producto = productosDB[nombreProducto];
+                const productoEnInventario = inventario.find(p => p.nombre === nombreProducto);
+                const cantidad = productoEnInventario ? productoEnInventario.cantidad : 0;
+
+                const card = document.createElement('div');
+                card.className = 'product-card';
+                card.onclick = () => {
+                    document.getElementById('productoNombre').value = nombreProducto;
+                    document.getElementById('productoTipo').value = producto.tipo;
+                    actualizarImagenProducto();
+                };
+
+                card.innerHTML = `
+                    <img src="${producto.imagen}" alt="${nombreProducto}">
+                    <div class="product-card-name">${nombreProducto}</div>
+                    <div class="product-card-type">${producto.tipo}</div>
+                    <div class="product-card-quantity">Stock: ${cantidad}</div>
+                `;
+
+                galeria.appendChild(card);
+            });
+        }
+
+        function limpiarFormulario(campos) {
+            campos.forEach(id => {
+                const elemento = document.getElementById(id);
+                if (elemento.tagName === 'INPUT' && elemento.type === 'date') {
+                    elemento.value = new Date().toISOString().split('T')[0];
+                } else {
+                    elemento.value = '';
+                }
+            });
+        }
+
+        function mostrarExito(elementId, mensaje) {
+            const elemento = document.getElementById(elementId);
+            elemento.textContent = mensaje;
+            elemento.classList.add('show');
+            setTimeout(() => {
+                elemento.classList.remove('show');
+            }, 3000);
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            const hoy = new Date().toISOString().split('T')[0];
+            document.getElementById('productoFecha').value = hoy;
+            document.getElementById('retiroFecha').value = hoy;
+            document.getElementById('pagoFecha').value = hoy;
+
+            const hora = new Date().toTimeString().slice(0, 5);
+            document.getElementById('retiroHora').value = hora;
+
+            verificarSesion();
+        });
+    </script>
+</body>
+</html>
